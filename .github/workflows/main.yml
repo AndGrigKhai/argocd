@@ -9,7 +9,7 @@ on:
 env:
   REGISTRY_URL: ghcr.io
   REGISTRY_USERNAME: andgrigkhai
-  SERVICE_NAME: argocd/app:latest
+  SERVICE_NAME: argocd/app
 
 jobs:
   build:
