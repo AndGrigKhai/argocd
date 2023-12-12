@@ -22,11 +22,11 @@ jobs:
           registry: ${{ env.REGISTRY_URL }}
           username: ${{ env.REGISTRY_USERNAME }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: 1k-off/action-semver-tag-release@1.0.3
+      - name: Set version
         id: version
-        with:
-          version: latest
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ver="$(date +%Y%m%d%H%M)"
+          echo "version=$ver" >> $GITHUB_OUTPUT
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Build and push docker containers
@@ -38,7 +38,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           tags: |
-            ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_USERNAME }}/${{ env.SERVICE_NAME }}:${{ steps.version.outputs.tag }}
+            ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_USERNAME }}/${{ env.SERVICE_NAME }}:${{ steps.version.outputs.version }}
             ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_USERNAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
             ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_USERNAME }}/${{ env.SERVICE_NAME }}:latest
 
@@ -60,9 +60,9 @@ jobs:
           changes: |
             {
               "lab-argo/values.yaml": {
-                "image.tag": "${{ steps.version.outputs.tag }}"
+                "image.tag": "${{ steps.version.outputs.version }}"
               },
               "lab-argo/Chart.yaml": {
-                "appVersion": "${{ steps.version.outputs.tag }}"
+                "appVersion": "${{ steps.version.outputs.version }}"
               }
             }
